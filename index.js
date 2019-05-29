@@ -2,19 +2,19 @@
 const  express = require('express');
 const cors = require('cors');
 const mysql = require('mysql');
+const bodyParser = require('body-parser');
+bodyParser.json();
 
 //create the express application
 const app = express();
-
+app.use(bodyParser.json());
 //connect to the DB
-const db_config = mysql.createPool({
-    connectionLimit : 100,
+const connection = mysql.createConnection({
     host            : '127.0.0.1',
     user            : 'root',
     password        : 'unicorn', //*super ultra secret pass*
     database        : 'products'
 });
-const connection = mysql.createConnection(db_config);
 
 app.use(cors());
 
@@ -25,14 +25,39 @@ app.get('/', (req,res)=>{
 });
 //GET all products
 app.get('/products',(req,res )=>{
-    //query the db for the products
-    connection.query('SELECT * FROM PRODUCTS',(e,results)=>{
+    //query db for products
+    connection.query('SELECT * FROM fruits',(e,results)=>{
         if (e) return res.send(e);
         return res.json({
             data:results
         })
     })
 });
+//POST new products
+app.post('/products',(req,res)=>{
+   //get body of request
+    const product = {
+        name: req.body.name,
+        price: req.body.price,
+        count: req.body.count
+    };
+    //get needed values
+   const name = product.name;
+   const price = product.price;
+   const count = product['count'];
+   //check db for duplication->avoid false 200
+   const CHECK_DB = `SELECT * FROM fruits WHERE name = '${name}'`;
+   connection.query(CHECK_DB,(e)=>{
+           if(e) return res.status(400).send('The item already exists, try updating it instead.')
+   });
+    //insert new values in the db
+   const INSERT_PRODUCTS_QUERY = `INSERT INTO fruits (name,price,count) VALUES ('${name}','${price}','${count}')`;
+   connection.query(INSERT_PRODUCTS_QUERY,(e)=>{
+       if(e) return res.send(e);
+       return res.send(`successfully added ${JSON.stringify(product)}`);
+   })
+});
+
 
 //start the server on port 4000
 //use localhost:4000/routes to visit various routes in the ap
