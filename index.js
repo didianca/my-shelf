@@ -73,7 +73,7 @@ app.put('/products/:id', (req, res) => {
         return res.json({
             data: results
         })
-        })
+    })
 });
 //DEL existing products
 app.delete('/products/:id', (req, res) => {
