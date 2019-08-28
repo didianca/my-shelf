@@ -1,9 +1,0 @@
-            Todo:
-
-->Add products to the shelf
-    ->name
-    ->price
-    ->count
-->Add an amount of "available money" kept in memory 'till u make the purchase
-->Add items to cart
-->Buy button that sends an e-mail to the person's email address to notify the purchase
